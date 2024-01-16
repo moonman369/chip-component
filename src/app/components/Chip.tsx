@@ -88,7 +88,11 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
     <div className="w-full">
       <div className="flex flex-row bg-white text-black flex-wrap">
         {selectedItems.map((selectedItem) => (
-          <SingleChip item={selectedItem} handleChipRemove={handleChipRemove} />
+          <SingleChip
+            key={selectedItem._id}
+            item={selectedItem}
+            handleChipRemove={handleChipRemove}
+          />
         ))}
 
         <div className="flex flex-col">
