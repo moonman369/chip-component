@@ -86,6 +86,9 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
 
   return (
     <div className="w-full">
+      <h1 className="items-center text-3xl mb-10 text-green-600">
+        Sample Chip Component
+      </h1>
       <div className="flex flex-row bg-white text-black flex-wrap">
         {selectedItems.map((selectedItem) => (
           <SingleChip
