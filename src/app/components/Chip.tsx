@@ -42,6 +42,7 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
       (selectedItem) => selectedItem !== item
     );
     setSelectedItems(updatedItems);
+    setHighlightEnabled(false);
   };
 
   useEffect(() => {
@@ -117,7 +118,7 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
           inputRef.current && inputRef.current.focus();
         }}
         onKeyDown={(e) => {
-          if (e.key === "Backspace") {
+          if (e.key === "Backspace" && !inputValue) {
             if (!highlightEnabled) {
               setHighlightEnabled(true);
               return;
@@ -152,7 +153,13 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
         </div>
       </div>
       <div
-        className={`mt-2 bg-white ml-[${inputRef.current?.offsetLeft}px] sm:w-1/3 w-full text-black`}
+        className={`mt-2 bg-white ml-[${
+          inputRef.current?.offsetLeft
+        }px] sm:w-1/3 w-full text-black rounded-lg ${
+          filteredItems.length > 0
+            ? "overflow-hidden h-[350px] overflow-y-scroll"
+            : ""
+        }`}
         style={{ marginLeft: inputRef.current?.offsetLeft }}
       >
         <ul>
