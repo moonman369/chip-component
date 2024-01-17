@@ -16,7 +16,9 @@ const SingleChip: React.FC<SingleChipProps> = ({
     <div
       key={item._id}
       className={`${
-        highlight ? "bg-blue-300 border-2 border-black" : "bg-blue-200"
+        highlight
+          ? "bg-blue-300 border-2 border-black font-bold"
+          : "bg-blue-200"
       } text-gray-700 rounded-full mr-2 mt-2 mb-2 flex flex-row justify-between pr-4`}
     >
       <Blockies
