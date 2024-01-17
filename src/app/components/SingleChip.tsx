@@ -4,13 +4,20 @@ import { RxCross2 } from "react-icons/rx";
 interface SingleChipProps {
   item: { _id: string; name: string; email: string };
   handleChipRemove: Function;
+  highlight: boolean;
 }
 
-const SingleChip: React.FC<SingleChipProps> = ({ item, handleChipRemove }) => {
+const SingleChip: React.FC<SingleChipProps> = ({
+  item,
+  handleChipRemove,
+  highlight,
+}) => {
   return (
     <div
       key={item._id}
-      className="bg-blue-200 text-gray-700 rounded-full mr-2 mt-2 mb-2 flex flex-row justify-between pr-4"
+      className={`${
+        highlight ? "bg-blue-300 border-2 border-black" : "bg-blue-200"
+      } text-gray-700 rounded-full mr-2 mt-2 mb-2 flex flex-row justify-between pr-4`}
     >
       <Blockies
         seed={item.email}

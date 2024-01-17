@@ -14,7 +14,11 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
   const [filteredItems, setFilteredItems] = useState<
     { _id: string; name: string; email: string }[]
   >([]);
+  const [inputWidth, setInputWidth] = useState<number>(0);
+  const [highlightEnabled, setHighlightEnabled] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const divRef = useRef<HTMLDivElement>(null);
+  const chipRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -53,10 +57,7 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
         name: string;
         email: string;
       }[] = [];
-      // items.filter(
-      //   (item) =>
-      //     !selectedItems.includes(item) && item.name.includes(inputValue)
-      // );
+
       for (let item of itemsCopy) {
         if (
           !selectedItems.includes(item) &&
@@ -65,16 +66,27 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
           filteredItemsStartsWith.push(item);
         }
       }
+      filteredItemsStartsWith.sort((a, b) =>
+        a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+      );
+
       for (let item of itemsCopy) {
         if (
           !selectedItems.includes(item) &&
-          item.name.toLowerCase().includes(inputValue.toLowerCase())
+          item.name.toLowerCase().includes(inputValue.toLowerCase()) &&
+          filteredItemsStartsWith
+            .map((filItem) => filItem.name.toLowerCase())
+            .indexOf(item.name.toLowerCase()) == -1
         ) {
           filteredItemsIncludes.push(item);
         }
       }
+      filteredItemsIncludes.sort((a, b) =>
+        a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+      );
+
       console.log(filteredItemsStartsWith, filteredItemsIncludes);
-      setFilteredItems((filteredItems) => [
+      setFilteredItems(() => [
         ...filteredItemsStartsWith,
         ...filteredItemsIncludes,
       ]);
@@ -82,6 +94,15 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
       setFilteredItems([]);
     }
     console.log(inputRef.current?.offsetLeft);
+    console.log(divRef.current?.offsetWidth);
+    divRef.current?.offsetWidth &&
+      chipRef.current?.offsetWidth &&
+      setInputWidth(
+        divRef.current?.offsetWidth -
+          chipRef.current?.offsetWidth -
+          40 * selectedItems.length
+      );
+    console.log(inputWidth);
   }, [inputValue]);
 
   return (
@@ -89,28 +110,50 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
       <h1 className="items-center text-3xl mb-10 text-green-600">
         Sample Chip Component
       </h1>
-      <div className="flex flex-row bg-white text-black flex-wrap">
-        {selectedItems.map((selectedItem) => (
+      <div
+        ref={divRef}
+        className="flex flex-row bg-white text-black flex-wrap px-3 mx-4 rounded-lg"
+        onClick={() => {
+          inputRef.current && inputRef.current.focus();
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Backspace") {
+            if (!highlightEnabled) {
+              setHighlightEnabled(true);
+              return;
+            } else {
+              setSelectedItems((selectedItems) =>
+                selectedItems.slice(0, selectedItems.length - 1)
+              );
+              setHighlightEnabled(false);
+            }
+          }
+        }}
+      >
+        {selectedItems.map((selectedItem, index) => (
           <SingleChip
             key={selectedItem._id}
             item={selectedItem}
             handleChipRemove={handleChipRemove}
+            highlight={highlightEnabled && index == selectedItems.length - 1}
           />
         ))}
 
-        <div className="flex flex-col">
+        <div className="flex flex-col rounded-lg float-none overflow-hidden">
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
             onChange={handleInputChange}
             placeholder=""
-            className="border-none focus:outline-none w-full py-3 px-3"
+            className="border-none focus:outline-none py-3 px-3"
+            // style={{ width: selectedItems.length > 0 ? inputWidth : "100%" }}
           />
         </div>
       </div>
       <div
-        className={`mt-2 bg-white ml-[${inputRef.current?.offsetLeft}px] w-1/3 text-black`}
+        className={`mt-2 bg-white ml-[${inputRef.current?.offsetLeft}px] sm:w-1/3 w-full text-black`}
+        style={{ marginLeft: inputRef.current?.offsetLeft }}
       >
         <ul>
           {filteredItems.map((item) => (
