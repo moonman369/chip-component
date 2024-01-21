@@ -16,12 +16,15 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
   >([]);
   const [inputWidth, setInputWidth] = useState<number>(0);
   const [highlightEnabled, setHighlightEnabled] = useState<boolean>(false);
+  const [selectedOption, setSelectedOption] = useState<number>(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const divRef = useRef<HTMLDivElement>(null);
   const chipRef = useRef<HTMLDivElement>(null);
+  const filtRef = useRef<HTMLUListElement>(null);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
+    setHighlightEnabled(true);
   };
 
   const handleItemClick = (item: {
@@ -31,6 +34,7 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
   }) => {
     !selectedItems.includes(item) && setSelectedItems([...selectedItems, item]);
     setInputValue("");
+    setHighlightEnabled(false);
   };
 
   const handleChipRemove = (item: {
@@ -94,6 +98,7 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
     } else {
       setFilteredItems([]);
     }
+    filtRef.current && filtRef.current.scrollIntoView();
     console.log(inputRef.current?.offsetLeft);
     console.log(divRef.current?.offsetWidth);
     divRef.current?.offsetWidth &&
@@ -128,6 +133,11 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
               );
               setHighlightEnabled(false);
             }
+          } else if (
+            e.key === "ArrowDown" &&
+            selectedOption < filteredItems.length
+          ) {
+            setSelectedOption((selectedOption) => selectedOption + 1);
           }
         }}
       >
@@ -162,12 +172,16 @@ const Chip: React.FC<ChipProps> = ({ items }) => {
         }`}
         style={{ marginLeft: inputRef.current?.offsetLeft }}
       >
-        <ul>
-          {filteredItems.map((item) => (
+        <ul ref={filtRef}>
+          {filteredItems.map((item, index) => (
             <li
               key={item._id}
               onClick={() => handleItemClick(item)}
-              className={`cursor-pointer hover:bg-gray-200 p-2 ml-[${inputRef.current?.offsetLeft}px] flex flex-row`}
+              className={`cursor-pointer ${
+                selectedOption === index ? "bg-gray-300" : ""
+              } hover:bg-gray-200 p-2 ml-[${
+                inputRef.current?.offsetLeft
+              }px] flex flex-row`}
             >
               <Blockies seed={item.email} className="rounded-full" />
               <div className="justify-between">
